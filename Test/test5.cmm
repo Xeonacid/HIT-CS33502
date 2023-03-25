@@ -1,9 +1,9 @@
-struct Complex
+struct A
 {
     float real, image;
 };
 int main()
 {
-    struct Complex x;
+    struct A x;
     y.image = 3.5;
 }
