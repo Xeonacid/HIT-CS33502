@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <filename>"
+    exit 1
+fi
+
+FILENAME=$(readlink -f "$1")
+
+cd $(dirname "${BASH_SOURCE[0]}")
+
+if [ ! -f "./parser-bin" ]; then
+    echo "Error: Parser not found in the current directory."
+    exit 1
+fi
+./parser-bin "$FILENAME" 2>&1 | tee output.txt

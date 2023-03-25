@@ -73,6 +73,7 @@ VarDec : ID { $$ = new_non_terminal_node("VarDec", 1, $1); }
        ;
 FunDec : ID LP VarList RP { $$ = new_non_terminal_node("FunDec", 4, $1, $2, $3, $4); }
        | ID LP RP { $$ = new_non_terminal_node("FunDec", 3, $1, $2, $3); }
+       | error RP { error = true; }
        ;
 VarList : ParamDec COMMA VarList { $$ = new_non_terminal_node("VarList", 3, $1, $2, $3); }
         | ParamDec { $$ = new_non_terminal_node("VarList", 1, $1); }
@@ -97,13 +98,13 @@ DefList : Def DefList { $$ = new_non_terminal_node("DefList", 2, $1, $2); }
         | { $$ = new_non_terminal_node("DefList", 0); }
         ;
 Def : Specifier DecList SEMI { $$ = new_non_terminal_node("Def", 3, $1, $2, $3); }
+    | Specifier error SEMI { error = true; }
     ;
 DecList : Dec { $$ = new_non_terminal_node("DecList", 1, $1);}
         | Dec COMMA DecList { $$ = new_non_terminal_node("DecList", 3, $1, $2, $3); }
         ;
 Dec : VarDec { $$ = new_non_terminal_node("Dec", 1, $1); }
     | VarDec ASSIGNOP Exp { $$ = new_non_terminal_node("Dec", 3, $1, $2, $3); }
-    | error RP { error = true; }
     ;
 Exp : Exp ASSIGNOP Exp { $$ = new_non_terminal_node("Exp", 3, $1, $2, $3); }
     | Exp AND Exp { $$ = new_non_terminal_node("Exp", 3, $1, $2, $3); }
