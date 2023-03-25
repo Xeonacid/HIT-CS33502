@@ -67,11 +67,11 @@
 
 
 /* First part of user prologue.  */
-#line 1 "./syntax.y"
+#line 1 "syntax.y"
 
 #include "node.h"
 
-#line 75 "./syntax.tab.c"
+#line 75 "syntax.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -1598,385 +1598,385 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* Program: ExtDefList  */
-#line 47 "./syntax.y"
+#line 47 "syntax.y"
                      { root = (yyval.node) = new_non_terminal_node("Program", 1, (yyvsp[0].node)); }
-#line 1604 "./syntax.tab.c"
+#line 1604 "syntax.tab.c"
     break;
 
   case 3: /* ExtDefList: ExtDef ExtDefList  */
-#line 49 "./syntax.y"
+#line 49 "syntax.y"
                                { (yyval.node) = new_non_terminal_node("ExtDefList", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1610 "./syntax.tab.c"
+#line 1610 "syntax.tab.c"
     break;
 
   case 4: /* ExtDefList: %empty  */
-#line 50 "./syntax.y"
+#line 50 "syntax.y"
              { (yyval.node) = new_non_terminal_node("ExtDefList", 0); }
-#line 1616 "./syntax.tab.c"
+#line 1616 "syntax.tab.c"
     break;
 
   case 5: /* ExtDef: Specifier ExtDecList SEMI  */
-#line 52 "./syntax.y"
+#line 52 "syntax.y"
                                    { (yyval.node) = new_non_terminal_node("ExtDef", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1622 "./syntax.tab.c"
+#line 1622 "syntax.tab.c"
     break;
 
   case 6: /* ExtDef: Specifier SEMI  */
-#line 53 "./syntax.y"
+#line 53 "syntax.y"
                         { (yyval.node) = new_non_terminal_node("ExtDef", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1628 "./syntax.tab.c"
+#line 1628 "syntax.tab.c"
     break;
 
   case 7: /* ExtDef: Specifier FunDec CompSt  */
-#line 54 "./syntax.y"
+#line 54 "syntax.y"
                                  { (yyval.node) = new_non_terminal_node("ExtDef", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1634 "./syntax.tab.c"
+#line 1634 "syntax.tab.c"
     break;
 
   case 8: /* ExtDecList: VarDec  */
-#line 56 "./syntax.y"
+#line 56 "syntax.y"
                     { (yyval.node) = new_non_terminal_node("ExtDecList", 1, (yyvsp[0].node)); }
-#line 1640 "./syntax.tab.c"
+#line 1640 "syntax.tab.c"
     break;
 
   case 9: /* ExtDecList: VarDec COMMA ExtDecList  */
-#line 57 "./syntax.y"
+#line 57 "syntax.y"
                                      { (yyval.node) = new_non_terminal_node("ExtDecList", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1646 "./syntax.tab.c"
+#line 1646 "syntax.tab.c"
     break;
 
   case 10: /* Specifier: TYPE  */
-#line 59 "./syntax.y"
+#line 59 "syntax.y"
                  { (yyval.node) = new_non_terminal_node("Specifier", 1, (yyvsp[0].node)); }
-#line 1652 "./syntax.tab.c"
+#line 1652 "syntax.tab.c"
     break;
 
   case 11: /* Specifier: StructSpecifier  */
-#line 60 "./syntax.y"
+#line 60 "syntax.y"
                             { (yyval.node) = new_non_terminal_node("Specifier", 1, (yyvsp[0].node)); }
-#line 1658 "./syntax.tab.c"
+#line 1658 "syntax.tab.c"
     break;
 
   case 12: /* StructSpecifier: STRUCT OptTag LC DefList RC  */
-#line 62 "./syntax.y"
+#line 62 "syntax.y"
                                               { (yyval.node) = new_non_terminal_node("StructSpecifier", 5, (yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1664 "./syntax.tab.c"
+#line 1664 "syntax.tab.c"
     break;
 
   case 13: /* StructSpecifier: STRUCT Tag  */
-#line 63 "./syntax.y"
+#line 63 "syntax.y"
                              { (yyval.node) = new_non_terminal_node("StructSpecifier", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1670 "./syntax.tab.c"
+#line 1670 "syntax.tab.c"
     break;
 
   case 14: /* OptTag: ID  */
-#line 65 "./syntax.y"
+#line 65 "syntax.y"
             { (yyval.node) = new_non_terminal_node("OptTag", 1, (yyvsp[0].node)); }
-#line 1676 "./syntax.tab.c"
+#line 1676 "syntax.tab.c"
     break;
 
   case 15: /* OptTag: %empty  */
-#line 66 "./syntax.y"
+#line 66 "syntax.y"
          { (yyval.node) = new_non_terminal_node("OptTag", 0); }
-#line 1682 "./syntax.tab.c"
+#line 1682 "syntax.tab.c"
     break;
 
   case 16: /* Tag: ID  */
-#line 68 "./syntax.y"
+#line 68 "syntax.y"
          { (yyval.node) = new_non_terminal_node("Tag", 1, (yyvsp[0].node)); }
-#line 1688 "./syntax.tab.c"
+#line 1688 "syntax.tab.c"
     break;
 
   case 17: /* VarDec: ID  */
-#line 70 "./syntax.y"
+#line 70 "syntax.y"
             { (yyval.node) = new_non_terminal_node("VarDec", 1, (yyvsp[0].node)); }
-#line 1694 "./syntax.tab.c"
+#line 1694 "syntax.tab.c"
     break;
 
   case 18: /* VarDec: VarDec LB INT RB  */
-#line 71 "./syntax.y"
+#line 71 "syntax.y"
                           { (yyval.node) = new_non_terminal_node("VarDec", 4, (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1700 "./syntax.tab.c"
+#line 1700 "syntax.tab.c"
     break;
 
   case 19: /* VarDec: error RB  */
-#line 72 "./syntax.y"
+#line 72 "syntax.y"
                   { error = true; }
-#line 1706 "./syntax.tab.c"
+#line 1706 "syntax.tab.c"
     break;
 
   case 20: /* FunDec: ID LP VarList RP  */
-#line 74 "./syntax.y"
+#line 74 "syntax.y"
                           { (yyval.node) = new_non_terminal_node("FunDec", 4, (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1712 "./syntax.tab.c"
+#line 1712 "syntax.tab.c"
     break;
 
   case 21: /* FunDec: ID LP RP  */
-#line 75 "./syntax.y"
+#line 75 "syntax.y"
                   { (yyval.node) = new_non_terminal_node("FunDec", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1718 "./syntax.tab.c"
+#line 1718 "syntax.tab.c"
     break;
 
   case 22: /* FunDec: error RP  */
-#line 76 "./syntax.y"
+#line 76 "syntax.y"
                   { error = true; }
-#line 1724 "./syntax.tab.c"
+#line 1724 "syntax.tab.c"
     break;
 
   case 23: /* VarList: ParamDec COMMA VarList  */
-#line 78 "./syntax.y"
+#line 78 "syntax.y"
                                  { (yyval.node) = new_non_terminal_node("VarList", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1730 "./syntax.tab.c"
+#line 1730 "syntax.tab.c"
     break;
 
   case 24: /* VarList: ParamDec  */
-#line 79 "./syntax.y"
+#line 79 "syntax.y"
                    { (yyval.node) = new_non_terminal_node("VarList", 1, (yyvsp[0].node)); }
-#line 1736 "./syntax.tab.c"
+#line 1736 "syntax.tab.c"
     break;
 
   case 25: /* ParamDec: Specifier VarDec  */
-#line 81 "./syntax.y"
+#line 81 "syntax.y"
                             { (yyval.node) = new_non_terminal_node("ParamDec", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1742 "./syntax.tab.c"
+#line 1742 "syntax.tab.c"
     break;
 
   case 26: /* CompSt: LC DefList StmtList RC  */
-#line 83 "./syntax.y"
+#line 83 "syntax.y"
                                 { (yyval.node) = new_non_terminal_node("CompSt", 4, (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1748 "./syntax.tab.c"
+#line 1748 "syntax.tab.c"
     break;
 
   case 27: /* CompSt: error RC  */
-#line 84 "./syntax.y"
+#line 84 "syntax.y"
                   { error = true; }
-#line 1754 "./syntax.tab.c"
+#line 1754 "syntax.tab.c"
     break;
 
   case 28: /* StmtList: Stmt StmtList  */
-#line 86 "./syntax.y"
+#line 86 "syntax.y"
                          { (yyval.node) = new_non_terminal_node("StmtList", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1760 "./syntax.tab.c"
+#line 1760 "syntax.tab.c"
     break;
 
   case 29: /* StmtList: %empty  */
-#line 87 "./syntax.y"
+#line 87 "syntax.y"
            { (yyval.node) = new_non_terminal_node("StmtList", 0); }
-#line 1766 "./syntax.tab.c"
+#line 1766 "syntax.tab.c"
     break;
 
   case 30: /* Stmt: Exp SEMI  */
-#line 89 "./syntax.y"
+#line 89 "syntax.y"
                 { (yyval.node) = new_non_terminal_node("Stmt", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1772 "./syntax.tab.c"
+#line 1772 "syntax.tab.c"
     break;
 
   case 31: /* Stmt: CompSt  */
-#line 90 "./syntax.y"
+#line 90 "syntax.y"
               { (yyval.node) = new_non_terminal_node("Stmt", 1, (yyvsp[0].node)); }
-#line 1778 "./syntax.tab.c"
+#line 1778 "syntax.tab.c"
     break;
 
   case 32: /* Stmt: RETURN Exp SEMI  */
-#line 91 "./syntax.y"
+#line 91 "syntax.y"
                        { (yyval.node) = new_non_terminal_node("Stmt", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1784 "./syntax.tab.c"
+#line 1784 "syntax.tab.c"
     break;
 
   case 33: /* Stmt: IF LP Exp RP Stmt  */
-#line 92 "./syntax.y"
+#line 92 "syntax.y"
                                                { (yyval.node) = new_non_terminal_node("Stmt", 5, (yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1790 "./syntax.tab.c"
+#line 1790 "syntax.tab.c"
     break;
 
   case 34: /* Stmt: IF LP Exp RP Stmt ELSE Stmt  */
-#line 93 "./syntax.y"
+#line 93 "syntax.y"
                                    { (yyval.node) = new_non_terminal_node("Stmt", 7, (yyvsp[-6].node), (yyvsp[-5].node), (yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1796 "./syntax.tab.c"
+#line 1796 "syntax.tab.c"
     break;
 
   case 35: /* Stmt: WHILE LP Exp RP Stmt  */
-#line 94 "./syntax.y"
+#line 94 "syntax.y"
                             { (yyval.node) = new_non_terminal_node("Stmt", 5, (yyvsp[-4].node), (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1802 "./syntax.tab.c"
+#line 1802 "syntax.tab.c"
     break;
 
   case 36: /* Stmt: error SEMI  */
-#line 95 "./syntax.y"
+#line 95 "syntax.y"
                   { error = true; }
-#line 1808 "./syntax.tab.c"
+#line 1808 "syntax.tab.c"
     break;
 
   case 37: /* DefList: Def DefList  */
-#line 97 "./syntax.y"
+#line 97 "syntax.y"
                       { (yyval.node) = new_non_terminal_node("DefList", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1814 "./syntax.tab.c"
+#line 1814 "syntax.tab.c"
     break;
 
   case 38: /* DefList: %empty  */
-#line 98 "./syntax.y"
+#line 98 "syntax.y"
           { (yyval.node) = new_non_terminal_node("DefList", 0); }
-#line 1820 "./syntax.tab.c"
+#line 1820 "syntax.tab.c"
     break;
 
   case 39: /* Def: Specifier DecList SEMI  */
-#line 100 "./syntax.y"
+#line 100 "syntax.y"
                              { (yyval.node) = new_non_terminal_node("Def", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1826 "./syntax.tab.c"
+#line 1826 "syntax.tab.c"
     break;
 
   case 40: /* Def: Specifier error SEMI  */
-#line 101 "./syntax.y"
+#line 101 "syntax.y"
                            { error = true; }
-#line 1832 "./syntax.tab.c"
+#line 1832 "syntax.tab.c"
     break;
 
   case 41: /* DecList: Dec  */
-#line 103 "./syntax.y"
+#line 103 "syntax.y"
               { (yyval.node) = new_non_terminal_node("DecList", 1, (yyvsp[0].node));}
-#line 1838 "./syntax.tab.c"
+#line 1838 "syntax.tab.c"
     break;
 
   case 42: /* DecList: Dec COMMA DecList  */
-#line 104 "./syntax.y"
+#line 104 "syntax.y"
                             { (yyval.node) = new_non_terminal_node("DecList", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1844 "./syntax.tab.c"
+#line 1844 "syntax.tab.c"
     break;
 
   case 43: /* Dec: VarDec  */
-#line 106 "./syntax.y"
+#line 106 "syntax.y"
              { (yyval.node) = new_non_terminal_node("Dec", 1, (yyvsp[0].node)); }
-#line 1850 "./syntax.tab.c"
+#line 1850 "syntax.tab.c"
     break;
 
   case 44: /* Dec: VarDec ASSIGNOP Exp  */
-#line 107 "./syntax.y"
+#line 107 "syntax.y"
                           { (yyval.node) = new_non_terminal_node("Dec", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1856 "./syntax.tab.c"
+#line 1856 "syntax.tab.c"
     break;
 
   case 45: /* Exp: Exp ASSIGNOP Exp  */
-#line 109 "./syntax.y"
+#line 109 "syntax.y"
                        { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1862 "./syntax.tab.c"
+#line 1862 "syntax.tab.c"
     break;
 
   case 46: /* Exp: Exp AND Exp  */
-#line 110 "./syntax.y"
+#line 110 "syntax.y"
                   { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1868 "./syntax.tab.c"
+#line 1868 "syntax.tab.c"
     break;
 
   case 47: /* Exp: Exp OR Exp  */
-#line 111 "./syntax.y"
+#line 111 "syntax.y"
                  { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1874 "./syntax.tab.c"
+#line 1874 "syntax.tab.c"
     break;
 
   case 48: /* Exp: Exp RELOP Exp  */
-#line 112 "./syntax.y"
+#line 112 "syntax.y"
                     { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1880 "./syntax.tab.c"
+#line 1880 "syntax.tab.c"
     break;
 
   case 49: /* Exp: Exp PLUS Exp  */
-#line 113 "./syntax.y"
+#line 113 "syntax.y"
                    { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1886 "./syntax.tab.c"
+#line 1886 "syntax.tab.c"
     break;
 
   case 50: /* Exp: Exp MINUS Exp  */
-#line 114 "./syntax.y"
+#line 114 "syntax.y"
                     { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1892 "./syntax.tab.c"
+#line 1892 "syntax.tab.c"
     break;
 
   case 51: /* Exp: Exp STAR Exp  */
-#line 115 "./syntax.y"
+#line 115 "syntax.y"
                    { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1898 "./syntax.tab.c"
+#line 1898 "syntax.tab.c"
     break;
 
   case 52: /* Exp: Exp DIV Exp  */
-#line 116 "./syntax.y"
+#line 116 "syntax.y"
                   { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1904 "./syntax.tab.c"
+#line 1904 "syntax.tab.c"
     break;
 
   case 53: /* Exp: LP Exp RP  */
-#line 117 "./syntax.y"
+#line 117 "syntax.y"
                 { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1910 "./syntax.tab.c"
+#line 1910 "syntax.tab.c"
     break;
 
   case 54: /* Exp: MINUS Exp  */
-#line 118 "./syntax.y"
+#line 118 "syntax.y"
                 { (yyval.node) = new_non_terminal_node("Exp", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1916 "./syntax.tab.c"
+#line 1916 "syntax.tab.c"
     break;
 
   case 55: /* Exp: NOT Exp  */
-#line 119 "./syntax.y"
+#line 119 "syntax.y"
               { (yyval.node) = new_non_terminal_node("Exp", 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1922 "./syntax.tab.c"
+#line 1922 "syntax.tab.c"
     break;
 
   case 56: /* Exp: ID LP Args RP  */
-#line 120 "./syntax.y"
+#line 120 "syntax.y"
                     { (yyval.node) = new_non_terminal_node("Exp", 4, (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1928 "./syntax.tab.c"
+#line 1928 "syntax.tab.c"
     break;
 
   case 57: /* Exp: ID LP RP  */
-#line 121 "./syntax.y"
+#line 121 "syntax.y"
                { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1934 "./syntax.tab.c"
+#line 1934 "syntax.tab.c"
     break;
 
   case 58: /* Exp: Exp LB Exp RB  */
-#line 122 "./syntax.y"
+#line 122 "syntax.y"
                     { (yyval.node) = new_non_terminal_node("Exp", 4, (yyvsp[-3].node), (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1940 "./syntax.tab.c"
+#line 1940 "syntax.tab.c"
     break;
 
   case 59: /* Exp: Exp DOT ID  */
-#line 123 "./syntax.y"
+#line 123 "syntax.y"
                  { (yyval.node) = new_non_terminal_node("Exp", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1946 "./syntax.tab.c"
+#line 1946 "syntax.tab.c"
     break;
 
   case 60: /* Exp: ID  */
-#line 124 "./syntax.y"
+#line 124 "syntax.y"
          { (yyval.node) = new_non_terminal_node("Exp", 1, (yyvsp[0].node)); }
-#line 1952 "./syntax.tab.c"
+#line 1952 "syntax.tab.c"
     break;
 
   case 61: /* Exp: INT  */
-#line 125 "./syntax.y"
+#line 125 "syntax.y"
           { (yyval.node) = new_non_terminal_node("Exp", 1, (yyvsp[0].node)); }
-#line 1958 "./syntax.tab.c"
+#line 1958 "syntax.tab.c"
     break;
 
   case 62: /* Exp: FLOAT  */
-#line 126 "./syntax.y"
+#line 126 "syntax.y"
             { (yyval.node) = new_non_terminal_node("Exp", 1, (yyvsp[0].node)); }
-#line 1964 "./syntax.tab.c"
+#line 1964 "syntax.tab.c"
     break;
 
   case 63: /* Args: Exp COMMA Args  */
-#line 128 "./syntax.y"
+#line 128 "syntax.y"
                       { (yyval.node) = new_non_terminal_node("Args", 3, (yyvsp[-2].node), (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1970 "./syntax.tab.c"
+#line 1970 "syntax.tab.c"
     break;
 
   case 64: /* Args: Exp  */
-#line 129 "./syntax.y"
+#line 129 "syntax.y"
            { (yyval.node) = new_non_terminal_node("Args", 1, (yyvsp[0].node)); }
-#line 1976 "./syntax.tab.c"
+#line 1976 "syntax.tab.c"
     break;
 
 
-#line 1980 "./syntax.tab.c"
+#line 1980 "syntax.tab.c"
 
       default: break;
     }
@@ -2205,7 +2205,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 131 "./syntax.y"
+#line 131 "syntax.y"
 
 #include "lex.yy.c"
 yyerror(char* msg) {

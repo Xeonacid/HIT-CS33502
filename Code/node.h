@@ -4,7 +4,7 @@
 #include <stdbool.h>
 
 typedef struct node {
-    char* type;
+    char *type;
     int lineno;
     bool is_token;
     union {

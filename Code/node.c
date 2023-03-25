@@ -18,7 +18,7 @@ node* new_token_node(char* type, int lineno, char *val) {
         strcpy(n->sval, val);
     }
     else if(!strcmp(type, "INT"))
-        n->ival = atoi(val);
+        n->ival = strtol(val, NULL, 0);
     else if(!strcmp(type, "FLOAT"))
         n->fval = atof(val);
     return n;
@@ -46,19 +46,21 @@ node* new_non_terminal_node(char* type, size_t num, ...) {
 void print_tree(node *n, size_t level) {
     if(!n || (!n->is_token && !n->child && !n->sibling))
         return;
-
-    for (int i = 0; i < level; ++i)
-        printf("  ");
-    printf("%s", n->type);
-    if(!n->is_token)
-        printf(" (%d)", n->lineno);
-    else if(!strcmp(n->type, "ID") || !strcmp(n->type, "TYPE"))
-        printf(": %s", n->sval);
-    else if(!strcmp(n->type, "INT"))
-        printf(": %d", n->ival);
-    else if(!strcmp(n->type, "FLOAT"))
-        printf(": %f", n->fval);
-    puts("");
+    
+    if(n->is_token || n->child) {
+        for (int i = 0; i < level; ++i)
+            printf("  ");
+        printf("%s", n->type);
+        if(!n->is_token)
+            printf(" (%d)", n->lineno);
+        else if(!strcmp(n->type, "ID") || !strcmp(n->type, "TYPE"))
+            printf(": %s", n->sval);
+        else if(!strcmp(n->type, "INT"))
+            printf(": %d", n->ival);
+        else if(!strcmp(n->type, "FLOAT"))
+            printf(": %f", n->fval);
+        puts("");
+    }
     
     print_tree(n->child, level + 1);
     print_tree(n->sibling, level);
