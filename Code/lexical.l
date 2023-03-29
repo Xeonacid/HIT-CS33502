@@ -27,8 +27,11 @@ LINE_COMMENT \/\/.*{EOL}
     for(;;) {
         char c;
         while ((c = input()) != '*' && c);
-        if (!c)
+        if (!c) {
+            fprintf(stderr, "Error type A at Line %d: Unterminated comment.\n", yylineno);
+            error = true;
             break;
+        }
         if (c == '*') {
             c = input();
             if (c == '/')
