@@ -12,8 +12,8 @@ yycolumn += yyleng;
 
 %option yylineno
 
-INT 0|[1-9][0-9]*|0x[0-9a-fA-F]+|0[0-7]+
-FLOAT [0-9]+\.[0-9]+([eE][+-]?[0-9]+)?
+INT [1-9][0-9]*|0x[0-9a-fA-F]+|0[0-7]*
+FLOAT [0-9]+\.[0-9]+|([0-9]*\.[0-9]+|[0-9]+\.)([eE][+-]?[0-9]+)
 ID [_a-zA-Z][0-9_a-zA-Z]*
 RELOP >|<|>=|<=|==|!=
 TYPE int|float

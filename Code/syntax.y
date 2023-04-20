@@ -52,6 +52,7 @@ ExtDefList : ExtDef ExtDefList { $$ = new_non_terminal_node("ExtDefList", 2, $1,
 ExtDef : Specifier ExtDecList SEMI { $$ = new_non_terminal_node("ExtDef", 3, $1, $2, $3); }
        | Specifier SEMI { $$ = new_non_terminal_node("ExtDef", 2, $1, $2); }
        | Specifier FunDec CompSt { $$ = new_non_terminal_node("ExtDef", 3, $1, $2, $3); }
+       | Specifier FunDec SEMI { $$ = new_non_terminal_node("ExtDef", 3, $1, $2, $3); }
        ;
 ExtDecList : VarDec { $$ = new_non_terminal_node("ExtDecList", 1, $1); }
            | VarDec COMMA ExtDecList { $$ = new_non_terminal_node("ExtDecList", 3, $1, $2, $3); }

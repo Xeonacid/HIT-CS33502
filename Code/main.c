@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "node.h"
+#include "semantic.h"
 #include "syntax.tab.h"
 
 extern FILE *yyin;
@@ -19,6 +19,8 @@ int main(int argc, char** argv)
     }
     yyrestart(f);
     yyparse();
-    if(!error)
-        print_tree(root, 0);
+    if(!error) {
+        // print_tree(root, 0);
+        Program(root);
+    }
 }

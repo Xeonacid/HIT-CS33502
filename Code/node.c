@@ -14,8 +14,7 @@ node* new_token_node(char* type, int lineno, char *val) {
     n->child = NULL;
     n->sibling = NULL;
     if(!strcmp(type, "ID") || !strcmp(type, "TYPE")) {
-        n->sval = (char*)malloc(strlen(val) + 1);
-        strcpy(n->sval, val);
+        n->sval = strdup(val);
     }
     else if(!strcmp(type, "INT"))
         n->ival = strtol(val, NULL, 0);

@@ -7,6 +7,7 @@ typedef struct node {
     char *type;
     int lineno;
     bool is_token;
+    bool is_rvalue;
     union {
         char *sval;
         int ival;
