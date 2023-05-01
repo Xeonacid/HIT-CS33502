@@ -1,47 +1,8 @@
 #include "semantic.h"
-#include "hash.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
-
-typedef struct Type_ *Type;
-typedef struct FieldList_ *FieldList;
-typedef struct LinenoList_ *LinenoList;
-
-struct Type_ {
-    enum { BASIC, ARRAY, STRUCTURE, FUNCTION } kind;
-    int depth;
-    union {
-        // 基本类型
-        enum { INT, FLOAT } basic;
-        // 数组类型信息包括元素类型与数组大小构成
-        struct {
-            Type elem;
-            int size;
-        } array;
-        // 结构体类型信息是一个链表，首个为空
-        FieldList structure;
-        // 函数类型信息包括返回值类型与参数类型
-        struct {
-            Type return_type;
-            FieldList param;
-            // 函数声明时的行号，定义时设置为0
-            LinenoList lineno;
-        } function;
-    } u;
-};
-
-struct FieldList_ {
-    char *name;     // 域的名字
-    Type type;      // 域的类型
-    FieldList tail; // 下一个域
-};
-
-struct LinenoList_ {
-    int lineno;
-    LinenoList tail;
-};
 
 enum DecType {
     VAR,
@@ -150,7 +111,7 @@ Type Exp(node *exp) {
         Type type = (Type)malloc(sizeof(struct Type_));
         type->kind = BASIC;
         type->depth = depth;
-        type->u.basic = INT;
+        type->u.basic = TYPE_INT;
         return type;
     } else if (!strcmp(exp->child->type, "FLOAT")) {
         // Exp -> FLOAT
@@ -158,7 +119,7 @@ Type Exp(node *exp) {
         Type type = (Type)malloc(sizeof(struct Type_));
         type->kind = BASIC;
         type->depth = depth;
-        type->u.basic = FLOAT;
+        type->u.basic = TYPE_FLOAT;
         return type;
     } else if (!strcmp(exp->child->sibling->type, "ASSIGNOP")) {
         // Exp -> Exp ASSIGNOP Exp
@@ -217,6 +178,14 @@ Type Exp(node *exp) {
         // Exp -> ID LP RP
         exp->is_rvalue = true;
         node *id = exp->child;
+        if (!strcmp(id->sval, "read") || !strcmp(id->sval, "write")) {
+            // skip check for lab3
+            Type type = (Type)malloc(sizeof(struct Type_));
+            type->kind = BASIC;
+            type->depth = depth;
+            type->u.basic = TYPE_INT;
+            return type;
+        }
         node *args = id->sibling->sibling;
         Type func_type = find(symbol_table, id->sval);
         if (!func_type) {
@@ -246,7 +215,7 @@ Type Exp(node *exp) {
             fprintf(stderr, "Error type 10 at Line %d: is not an array.\n", exp->lineno);
             return NULL;
         }
-        if (index_type->kind != BASIC || index_type->u.basic != INT)
+        if (index_type->kind != BASIC || index_type->u.basic != TYPE_INT)
             fprintf(stderr, "Error type 12 at Line %d: is not an integer.\n", exp->lineno);
         return array_type->u.array.elem;
     } else if (!strcmp(exp->child->sibling->type, "DOT")) {
@@ -370,7 +339,7 @@ void Stmt(node *stmt, Type return_type) {
     else if (!strcmp(stmt->child->type, "CompSt")) {
         ++depth;
         CompSt(stmt->child, return_type);
-        leave_scope();
+        // leave_scope(); // for lab3
     }
 
     // Stmt -> RETURN Exp SEMI
@@ -466,13 +435,13 @@ Type Specifier(node *specifier) {
             Type type = (Type)malloc(sizeof(struct Type_));
             type->kind = BASIC;
             type->depth = depth;
-            type->u.basic = INT;
+            type->u.basic = TYPE_INT;
             return type;
         } else {
             Type type = (Type)malloc(sizeof(struct Type_));
             type->kind = BASIC;
             type->depth = depth;
-            type->u.basic = FLOAT;
+            type->u.basic = TYPE_FLOAT;
             return type;
         }
     } else
@@ -587,7 +556,7 @@ void ExtDef(node *extdef) {
         FunDec(fundec, return_type, is_def ? 0 : extdef->lineno);
         if (is_def)
             CompSt(fundec->sibling, return_type);
-        leave_scope();
+        // leave_scope(); // for lab3
     }
 }
 

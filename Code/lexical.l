@@ -45,7 +45,7 @@ LINE_COMMENT \/\/.*{EOL}
 ";" { yylval.node = new_token_node("SEMI", yylineno, NULL); return SEMI; }
 "," { yylval.node = new_token_node("COMMA", yylineno, NULL); return COMMA; }
 "=" { yylval.node = new_token_node("ASSIGNOP", yylineno, NULL); return ASSIGNOP; }
-{RELOP} { yylval.node = new_token_node("RELOP", yylineno, NULL); return RELOP; }
+{RELOP} { yylval.node = new_token_node("RELOP", yylineno, yytext); return RELOP; }
 "+" { yylval.node = new_token_node("PLUS", yylineno, NULL); return PLUS; }
 "-" { yylval.node = new_token_node("MINUS", yylineno, NULL); return MINUS; }
 "*" { yylval.node = new_token_node("STAR", yylineno, NULL); return STAR; }

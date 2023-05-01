@@ -13,9 +13,8 @@ node* new_token_node(char* type, int lineno, char *val) {
     n->is_token = true;
     n->child = NULL;
     n->sibling = NULL;
-    if(!strcmp(type, "ID") || !strcmp(type, "TYPE")) {
+    if(!strcmp(type, "ID") || !strcmp(type, "TYPE") || !strcmp(type, "RELOP"))
         n->sval = strdup(val);
-    }
     else if(!strcmp(type, "INT"))
         n->ival = strtol(val, NULL, 0);
     else if(!strcmp(type, "FLOAT"))

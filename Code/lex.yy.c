@@ -888,7 +888,7 @@ YY_RULE_SETUP
 case 10:
 YY_RULE_SETUP
 #line 48 "./lexical.l"
-{ yylval.node = new_token_node("RELOP", yylineno, NULL); return RELOP; }
+{ yylval.node = new_token_node("RELOP", yylineno, yytext); return RELOP; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP

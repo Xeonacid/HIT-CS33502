@@ -1,4 +1,6 @@
+.gdb_history
 scanner
 parser-bin
 semantic
+ir
 *.o
