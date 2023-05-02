@@ -131,7 +131,7 @@ void translate_Cond(node *exp, Operand label_true, Operand label_false) {
     node *exp_child = exp->child;
     node *exp_child_sibling = exp_child->sibling;
 
-    if (!strcmp(exp_child_sibling->type, "RELOP")) {
+    if (exp_child_sibling && !strcmp(exp_child_sibling->type, "RELOP")) {
         // Exp -> Exp RELOP Exp
         Operand t1 = new_temp();
         translate_Exp(exp_child, t1);
@@ -148,7 +148,7 @@ void translate_Cond(node *exp, Operand label_true, Operand label_false) {
         return;
     }
 
-    if (!strcmp(exp_child_sibling->type, "AND")) {
+    if (exp_child_sibling && !strcmp(exp_child_sibling->type, "AND")) {
         // Exp -> Exp AND Exp
         Operand label1 = new_label();
         translate_Cond(exp_child, label1, label_false);
@@ -157,7 +157,7 @@ void translate_Cond(node *exp, Operand label_true, Operand label_false) {
         return;
     }
 
-    if (!strcmp(exp_child_sibling->type, "OR")) {
+    if (exp_child_sibling && !strcmp(exp_child_sibling->type, "OR")) {
         // Exp -> Exp OR Exp
         Operand label1 = new_label();
         translate_Cond(exp_child, label_true, label1);
@@ -264,8 +264,11 @@ void translate_Exp(node *exp, Operand place) {
         Operand t2 = new_temp();
         translate_Exp(exp_child_sibling->sibling, t2);
         new_ir(IR_ASSIGN, t1, t2);
-        if (place)
+        if (place) {
             new_operand(place, OP_VARIABLE, t1->value);
+            if (t1->kind == OP_ADDRESS)
+                place->kind = OP_ADDRESS;
+        }
         return;
     }
 
@@ -378,6 +381,7 @@ void translate_Exp(node *exp, Operand place) {
 }
 
 void translate_VarDec(node *vardec, Operand place) {
+    // VarDec -> ID
     if (!strcmp(vardec->child->type, "ID")) {
         node *id = vardec->child;
         Type type = find(symbol_table, id->sval);
@@ -397,6 +401,7 @@ void translate_VarDec(node *vardec, Operand place) {
         return;
     }
 
+    // VarDec -> VarDec LB INT RB
     translate_VarDec(vardec->child, place);
 }
 
@@ -511,10 +516,10 @@ void translate_StmtList(node *stmtlist) {
 }
 
 void translate_Compst(node *compst) {
+    // CompSt -> LC DefList StmtList RC
     node *deflist = compst->child->sibling;
-    node *stmtlist = deflist->sibling;
     translate_DefList(deflist);
-    translate_StmtList(stmtlist);
+    translate_StmtList(deflist->sibling);
 }
 
 void translate_FunDec(node *fundec) {

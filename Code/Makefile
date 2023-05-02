@@ -17,6 +17,9 @@ YFC = $(shell find ./ -name "*.y" | sed s/[^/]*\\.y/syntax.tab.c/)
 LFO = $(LFC:.c=.o)
 YFO = $(YFC:.c=.o)
 
+ir: lexical syntax-c
+	$(CC) -o ir syntax.tab.c main.c node.c hash.c semantic.c ir.c -lfl -ly
+
 semantic: lexical syntax-c
 	$(CC) -o semantic syntax.tab.c main.c node.c hash.c semantic.c -lfl -ly
 
