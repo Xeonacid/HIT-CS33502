@@ -112,6 +112,7 @@ Type Exp(node *exp) {
         type->kind = BASIC;
         type->depth = depth;
         type->u.basic = TYPE_INT;
+        type->is_param = false;
         return type;
     } else if (!strcmp(exp->child->type, "FLOAT")) {
         // Exp -> FLOAT
@@ -120,6 +121,7 @@ Type Exp(node *exp) {
         type->kind = BASIC;
         type->depth = depth;
         type->u.basic = TYPE_FLOAT;
+        type->is_param = false;
         return type;
     } else if (!strcmp(exp->child->sibling->type, "ASSIGNOP")) {
         // Exp -> Exp ASSIGNOP Exp
@@ -184,6 +186,7 @@ Type Exp(node *exp) {
             type->kind = BASIC;
             type->depth = depth;
             type->u.basic = TYPE_INT;
+            type->is_param = false;
             return type;
         }
         node *args = id->sibling->sibling;
@@ -249,7 +252,7 @@ void VarDec(node *vardec, Type type, enum DecType dectype, Type exp_type, FieldL
             fprintf(stderr, "Error type 5 at Line %d: Type mismatched for assignment.\n", vardec->lineno);
             return;
         }
-        if (dectype == VAR || dectype == FUNC_DEF) {
+        // if (dectype == VAR || dectype == FUNC_DEF) { // for lab3
             // Compst -> LC DefList StmtList RC
             // FunDec -> ID LP VarList RP
             Type tmp;
@@ -258,7 +261,7 @@ void VarDec(node *vardec, Type type, enum DecType dectype, Type exp_type, FieldL
                 return;
             }
             insert(symbol_table, id->sval, type, depth);
-        }
+        // }
         if (dectype == STRUCT || dectype == FUNC_DEC || dectype == FUNC_DEF) {
             // StructSpecifier -> STRUCT OptTag LC DefList RC
             // FunDec -> ID LP VarList RP
@@ -284,6 +287,7 @@ void VarDec(node *vardec, Type type, enum DecType dectype, Type exp_type, FieldL
         array_type->depth = depth;
         array_type->u.array.elem = type;
         array_type->u.array.size = int_node->ival;
+        array_type->is_param = type->is_param;
         VarDec(vardec->child, array_type, dectype, exp_type, fieldlist, fieldlist_tail);
     }
 }
@@ -317,6 +321,7 @@ void DecList(node *declist, Type type, enum DecType dectype, FieldList *fieldlis
 void Def(node *def, enum DecType dectype, FieldList *fieldlist, FieldList *fieldlist_tail) {
     // Def -> Specifier DecList SEMI
     Type type = Specifier(def->child);
+    type->is_param = false;
     DecList(def->child->sibling, type, dectype, fieldlist, fieldlist_tail);
 }
 
@@ -392,7 +397,9 @@ Type Tag(node *tag) {
     Type type = find(struct_table, id->sval);
     if(!type)
         fprintf(stderr, "Error type 17 at Line %d: Undefined structure \"%s\".\n", tag->lineno, id->sval);
-    return type;
+    Type type_copy = (Type)malloc(sizeof(struct Type_));
+    memcpy(type_copy, type, sizeof(struct Type_));
+    return type_copy;
 }
 
 char *OptTag(node *opttag) {
@@ -436,12 +443,14 @@ Type Specifier(node *specifier) {
             type->kind = BASIC;
             type->depth = depth;
             type->u.basic = TYPE_INT;
+            type->is_param = false;
             return type;
         } else {
             Type type = (Type)malloc(sizeof(struct Type_));
             type->kind = BASIC;
             type->depth = depth;
             type->u.basic = TYPE_FLOAT;
+            type->is_param = false;
             return type;
         }
     } else
@@ -452,6 +461,7 @@ Type Specifier(node *specifier) {
 void ParamDec(node *paramdec, enum DecType dectype, FieldList *fieldlist, FieldList *fieldlist_tail) {
     // ParamDec -> Specifier VarDec
     Type type = Specifier(paramdec->child);
+    type->is_param = true;
     VarDec(paramdec->child->sibling, type, dectype, NULL, fieldlist, fieldlist_tail);
 }
 
@@ -490,6 +500,7 @@ Type FunDec(node *fundec, Type return_type, int dec_lineno) {
     type->kind = FUNCTION;
     type->depth = depth;
     type->u.function.return_type = return_type;
+    type->is_param = false;
     ++depth;
     // FunDec -> ID LP VarList RP
     type->u.function.param = id->sibling->sibling->sibling ? VarList(id->sibling->sibling, dec_lineno ? FUNC_DEC : FUNC_DEF) : NULL;

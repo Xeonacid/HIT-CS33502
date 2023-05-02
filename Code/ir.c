@@ -7,6 +7,8 @@
 
 struct InterCode *ir_head, *ir_tail;
 
+Type exp_array_element;
+
 void translate_Exp(node *exp, Operand place);
 void translate_Compst(node *compst);
 
@@ -21,24 +23,12 @@ Operand new_operand(Operand op, enum OperandKind kind, ...) {
             int tmp = va_arg(ap, int);
             char *value = (void*)malloc(sizeof(char) * 33);
             sprintf(value, "#%d", tmp);
-            op->print_name = op->value = value;
+            op->value = value;
             break;
         }
-        case OP_ADDRESS: {
-            const char* tmp = va_arg(ap, char*);
-            char *address_name = malloc(strlen(tmp) + 2);
-            sprintf(address_name, "&%s", tmp);
-            op->value = tmp;
-            op->print_name = address_name;
-            break;
-        }
-        case OP_VARIABLE:
-        case OP_LABEL:
-        case OP_FUNCTION:
-            op->print_name = op->value = va_arg(ap, char*);
-            break;
         default:
-            assert(0);
+            op->value = va_arg(ap, char*);
+            break;
     }
     return op;
 }
@@ -68,6 +58,8 @@ void new_ir(enum InterCodeKind kind, ...) {
     ir->kind = kind;
     switch (kind) {
         case IR_ADD:
+        case IR_ADD_ADDRESS:
+        case IR_ADD_GET_ADDRESS:
         case IR_SUB:
         case IR_MUL:
         case IR_DIV:
@@ -192,6 +184,55 @@ void translate_Args(node *args) {
     new_ir(IR_ARG, t1);
 }
 
+struct array_index {
+    Operand t;
+    struct array_index *prev, *next;
+};
+
+void translate_array(node *exp, Operand place) {
+    struct array_index *head = NULL, *tail = NULL;
+    int depth;
+    node *cur = exp;
+    // (ID LB Exp RB) LB Exp RB
+    // ((Exp DOT ID) LB Exp RB) LB Exp RB
+    while (cur->child->sibling && !strcmp(cur->child->sibling->type, "LB")) {
+        cur = cur->child;
+        struct array_index *index = (struct array_index*)malloc(sizeof(struct array_index));
+        Operand t = new_temp();
+        index->t = t;
+        translate_Exp(cur->sibling->sibling, t);
+        index->next = NULL;
+        if (head) {
+            tail->next = index;
+            index->prev = tail;
+        }
+        else {
+            head = index;
+            index->prev = NULL;
+        }
+        tail = index;
+        ++depth;
+    }
+    Operand base = new_temp();
+    translate_Exp(cur, base);
+    Type type = find(symbol_table, base->value);
+    for (struct array_index *index = tail; index; index = index->prev) {
+        Operand offset = new_temp();
+        new_ir(IR_MUL, offset, index->t, new_operand(NULL, OP_CONSTANT, get_size(type->u.array.elem)));
+        Operand t2 = new_temp();
+        new_ir(base->kind == OP_ARRAY_OR_STRUCTURE ? IR_ADD_GET_ADDRESS : IR_ADD_ADDRESS, place, base, offset);
+        base = place;
+        type = type->u.array.elem;
+    }
+    place->kind = OP_ADDRESS;
+    exp_array_element = type->u.array.elem;
+    for (struct array_index *index = head; index;) {
+        struct array_index *next = index->next;
+        free(index);
+        index = next;
+    }
+}
+
 void translate_Exp(node *exp, Operand place) {
     node *exp_child = exp->child;
 
@@ -204,7 +245,7 @@ void translate_Exp(node *exp, Operand place) {
     if (!strcmp(exp_child->type, "ID") && !exp_child->sibling) {
         // Exp -> ID
         Type type = find(symbol_table, exp_child->sval);
-        type->kind == BASIC ? new_operand(place, OP_VARIABLE, exp_child->sval) : new_operand(place, OP_ADDRESS, exp_child->sval);
+        new_operand(place, type->kind == BASIC ? OP_VARIABLE : (type->is_param ? OP_ADDRESS_PARAM : OP_ARRAY_OR_STRUCTURE), exp_child->sval);
         return;
     }
 
@@ -222,7 +263,7 @@ void translate_Exp(node *exp, Operand place) {
         translate_Exp(exp_child, t1);
         Operand t2 = new_temp();
         translate_Exp(exp_child_sibling->sibling, t2);
-        t1->kind == OP_ADDRESS ? new_ir(IR_WRITE_ADDRESS, t1, t2): new_ir(IR_ASSIGN, t1, t2);
+        new_ir(IR_ASSIGN, t1, t2);
         if (place)
             new_operand(place, OP_VARIABLE, t1->value);
         return;
@@ -278,29 +319,39 @@ void translate_Exp(node *exp, Operand place) {
         return;
     }
 
-    if (!strcmp(exp_child_sibling->type, "LB")) {
+    if (exp_child_sibling && !strcmp(exp_child_sibling->type, "LB")) {
         // Exp -> Exp LB Exp RB
-        Operand base = new_temp();
-        translate_Exp(exp_child, base);
-        Operand idx = new_temp();
-        translate_Exp(exp_child_sibling->sibling, idx);
-        // ID[Exp]
-        Type type = find(symbol_table, base->value);
-        Operand t1 = new_temp();
-        new_operand(t1, OP_CONSTANT, get_size(type->u.array.elem));
-        Operand offset = new_temp();
-        new_ir(IR_MUL, offset, idx, t1);
-        new_ir(IR_ADD, place, base, offset);
-        place->kind = OP_ADDRESS;
-
-        // Exp.ID[Exp]
-        // TODO
+        translate_array(exp, place);
         return;
     }
 
     if (!strcmp(exp_child_sibling->type, "DOT")) {
         // Exp -> Exp DOT ID
-        // TODO
+        Operand t1 = new_temp();
+        translate_Exp(exp_child, t1);
+        Type type = find(symbol_table, t1->value);
+        if (!type)
+            // Exp -> Exp LB Exp RB DOT ID
+            type = exp_array_element;
+        FieldList field = type->u.structure;
+        node *id = exp_child_sibling->sibling;
+        int offset = 0;
+        while (field) {
+            if (field->name) {
+                if (!strcmp(field->name, id->sval))
+                    break;
+                offset += get_size(field->type);
+            }
+            field = field->tail;
+        }
+        Operand t2 = new_temp();
+        new_operand(t2, OP_CONSTANT, offset);
+        new_ir(t1->kind == OP_ARRAY_OR_STRUCTURE ? IR_ADD_GET_ADDRESS : IR_ADD_ADDRESS, place, t1, t2);
+        place->kind = OP_ADDRESS;
+        if (field->type->kind == ARRAY)
+            // Exp -> Exp DOT ID LB Exp RB
+            place->value = id->sval;
+        return;
     }
 
     if (!strcmp(exp_child->type, "ID")) {
@@ -337,7 +388,7 @@ void translate_VarDec(node *vardec, Operand place) {
                 break;
             case ARRAY:
             case STRUCTURE:
-                Operand op = new_operand(place, OP_VARIABLE, id->sval);
+                Operand op = new_operand(place, OP_ARRAY_OR_STRUCTURE, id->sval);
                 new_ir(IR_DEC, op, get_size(type));
                 break;
             default:
@@ -469,15 +520,13 @@ void translate_Compst(node *compst) {
 void translate_FunDec(node *fundec) {
     // FunDec -> ID LP RP
     node *id = fundec->child;
-    Operand func = new_operand(NULL, OP_FUNCTION, id->sval);
-    new_ir(IR_FUNCTION, func);
+    new_ir(IR_FUNCTION, new_operand(NULL, OP_FUNCTION, id->sval));
     if (id->sibling->sibling->sibling) {
         // FunDec -> ID LP VarList RP
         Type type = find(symbol_table, id->sval);
         FieldList field = type->u.function.param->tail;
         while (field) {
-            Operand t1 = new_operand(NULL, OP_VARIABLE, field->name);
-            new_ir(IR_PARAM, t1);
+            new_ir(IR_PARAM, new_operand(NULL, OP_VARIABLE, field->name));
             field = field->tail;
         }
     }
@@ -510,7 +559,7 @@ void translate_Program(node *program) {
     translate_ExtDefList(program->child);
 }
 
-const char*deref_name_if_needed(Operand op) {
+const char*deref_name(Operand op) {
     if (op->kind != OP_ADDRESS)
         return op->value;
     const char *tmp = op->value;
@@ -519,28 +568,43 @@ const char*deref_name_if_needed(Operand op) {
     return deref_name;
 }
 
+const char*get_addr_name(Operand op) {
+    if (op->kind != OP_ARRAY_OR_STRUCTURE)
+        return op->value;
+    const char *tmp = op->value;
+    char *deref_name = malloc(strlen(tmp) + 2);
+    sprintf(deref_name, "&%s", tmp);
+    return deref_name;
+}
+
 void print_ir(struct InterCode *head, FILE *fp) {
     while (head) {
         switch (head->kind) {
             case IR_ASSIGN:
-                fprintf(fp, "%s := %s\n", head->u.assign.left->print_name,
-                        head->u.assign.right->print_name);
+                fprintf(fp, "%s := %s\n", deref_name(head->u.assign.left), deref_name(head->u.assign.right));
                 break;
             case IR_ADD:
-                fprintf(fp, "%s := %s + %s\n", head->u.binop.result->print_name,
-                        head->u.binop.op1->print_name, head->u.binop.op2->print_name);
+                fprintf(fp, "%s := %s + %s\n", head->u.binop.result->value,
+                        deref_name(head->u.binop.op1), deref_name(head->u.binop.op2));
+                break;
+            case IR_ADD_ADDRESS:
+                fprintf(fp, "%s := %s + %s\n", head->u.binop.result->value, head->u.binop.op1->value, head->u.binop.op2->value);
+                break;
+            case IR_ADD_GET_ADDRESS:
+                fprintf(fp, "%s := %s + %s\n", head->u.binop.result->value,
+                        get_addr_name(head->u.binop.op1), get_addr_name(head->u.binop.op2));
                 break;
             case IR_SUB:
-                fprintf(fp, "%s := %s - %s\n", head->u.binop.result->print_name,
-                        head->u.binop.op1->print_name, head->u.binop.op2->print_name);
+                fprintf(fp, "%s := %s - %s\n", head->u.binop.result->value,
+                        deref_name(head->u.binop.op1), deref_name(head->u.binop.op2));
                 break;
             case IR_MUL:
-                fprintf(fp, "%s := %s * %s\n", head->u.binop.result->print_name,
-                        head->u.binop.op1->print_name, head->u.binop.op2->print_name);
+                fprintf(fp, "%s := %s * %s\n", head->u.binop.result->value,
+                        deref_name(head->u.binop.op1), deref_name(head->u.binop.op2));
                 break;
             case IR_DIV:
-                fprintf(fp, "%s := %s / %s\n", head->u.binop.result->print_name,
-                        head->u.binop.op1->print_name, head->u.binop.op2->print_name);
+                fprintf(fp, "%s := %s / %s\n", head->u.binop.result->value,
+                        deref_name(head->u.binop.op1), deref_name(head->u.binop.op2));
                 break;
             case IR_LABEL:
                 fprintf(fp, "LABEL %s :\n", head->u.unaryop.op->value);
@@ -552,19 +616,19 @@ void print_ir(struct InterCode *head, FILE *fp) {
                 fprintf(fp, "GOTO %s\n", head->u.unaryop.op->value);
                 break;
             case IR_IF_GOTO:
-                fprintf(fp, "IF %s %s %s GOTO %s\n", deref_name_if_needed(head->u.if_goto.op1),
-                        head->u.if_goto.relop, deref_name_if_needed(head->u.if_goto.op2),
+                fprintf(fp, "IF %s %s %s GOTO %s\n", deref_name(head->u.if_goto.op1),
+                        head->u.if_goto.relop, deref_name(head->u.if_goto.op2),
                         head->u.if_goto.label->value);
                 break;
             case IR_RETURN:
-                fprintf(fp, "RETURN %s\n", deref_name_if_needed(head->u.unaryop.op));
+                fprintf(fp, "RETURN %s\n", deref_name(head->u.unaryop.op));
                 break;
             case IR_DEC:
                 fprintf(fp, "DEC %s %d\n", head->u.dec.op->value,
                         head->u.dec.size);
                 break;
             case IR_ARG:
-                fprintf(fp, "ARG %s\n", head->u.unaryop.op->print_name);
+                fprintf(fp, "ARG %s\n", get_addr_name(head->u.unaryop.op));
                 break;
             case IR_CALL:
                 fprintf(fp, "%s := CALL %s\n", head->u.assign.left->value,
@@ -574,10 +638,10 @@ void print_ir(struct InterCode *head, FILE *fp) {
                 fprintf(fp, "PARAM %s\n", head->u.unaryop.op->value);
                 break;
             case IR_READ:
-                fprintf(fp, "READ %s\n", deref_name_if_needed(head->u.unaryop.op));
+                fprintf(fp, "READ %s\n", deref_name(head->u.unaryop.op));
                 break;
             case IR_WRITE:
-                fprintf(fp, "WRITE %s\n", deref_name_if_needed(head->u.unaryop.op));
+                fprintf(fp, "WRITE %s\n", deref_name(head->u.unaryop.op));
                 break;
             case IR_GET_ADDRESS:
                 fprintf(fp, "%s := &%s\n", head->u.assign.left->value,

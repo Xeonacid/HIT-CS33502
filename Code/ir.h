@@ -4,13 +4,13 @@
 #include <stdio.h>
 
 typedef struct Operand_* Operand;
-enum OperandKind { OP_VARIABLE, OP_CONSTANT, OP_ADDRESS, OP_LABEL, OP_FUNCTION };
+enum OperandKind { OP_VARIABLE, OP_CONSTANT, OP_ADDRESS, OP_ARRAY_OR_STRUCTURE, OP_ADDRESS_PARAM, OP_LABEL, OP_FUNCTION };
 struct Operand_ {
     enum OperandKind kind;
-    const char *value, *print_name;
+    const char *value;
 };
 
-enum InterCodeKind { IR_ASSIGN, IR_ADD, IR_SUB, IR_MUL, IR_DIV, IR_LABEL, IR_FUNCTION, IR_GOTO, IR_IF_GOTO, IR_RETURN, IR_DEC, IR_ARG, IR_CALL, IR_PARAM, IR_READ, IR_WRITE, IR_GET_ADDRESS, IR_READ_ADDRESS, IR_WRITE_ADDRESS };
+enum InterCodeKind { IR_ASSIGN, IR_ADD, IR_ADD_ADDRESS, IR_ADD_GET_ADDRESS, IR_SUB, IR_MUL, IR_DIV, IR_LABEL, IR_FUNCTION, IR_GOTO, IR_IF_GOTO, IR_RETURN, IR_DEC, IR_ARG, IR_CALL, IR_PARAM, IR_READ, IR_WRITE, IR_GET_ADDRESS, IR_READ_ADDRESS, IR_WRITE_ADDRESS };
 struct InterCode
 {
     enum InterCodeKind kind;

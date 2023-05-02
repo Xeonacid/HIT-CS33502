@@ -9,6 +9,7 @@ typedef struct LinenoList_ *LinenoList;
 
 struct Type_ {
     enum { BASIC, ARRAY, STRUCTURE, FUNCTION } kind;
+    bool is_param;
     int depth;
     union {
         // 基本类型
